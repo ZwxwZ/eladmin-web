@@ -17,6 +17,13 @@ export function del(ids) {
   })
 }
 
+export function getByUserName(username) {
+  return request({
+    url: 'api/users' + '?page=0&size=10&blurry=' + username,
+    method: 'get'
+  })
+}
+
 export function edit(data) {
   return request({
     url: 'api/users',
@@ -65,5 +72,5 @@ export function updateEmail(form) {
   })
 }
 
-export default { add, edit, del, resetPwd }
+export default { add, edit, del, resetPwd, getByUserName }
 
