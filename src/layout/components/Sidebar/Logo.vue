@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      title: 'ELADMIN-后台管理',
+      title: '墨叶汽车',
       logo: Logo
     }
   }
@@ -47,7 +47,8 @@ export default {
   width: 100%;
   height: 50px;
   line-height: 50px;
-  text-align: center;
+  text-align: left;
+  padding-left: 16px;
   overflow: hidden;
 
   & .sidebar-logo-link {
