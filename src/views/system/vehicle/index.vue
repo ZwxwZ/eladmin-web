@@ -5,27 +5,28 @@
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <label class="el-form-item-label">来源</label>
-        <el-input v-model="query.source" clearable placeholder="来源" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.source" clearable size="small" placeholder="来源" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <label class="el-form-item-label">用户名称</label>
-        <el-input v-model="query.userName" clearable placeholder="用户名称" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.userName" clearable size="small" placeholder="用户名称" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <label class="el-form-item-label">车辆类型</label>
-        <el-input v-model="query.vehicleType" clearable placeholder="车辆类型" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.vehicleType" clearable size="small" placeholder="车辆类型" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <label class="el-form-item-label">车牌号码</label>
-        <el-input v-model="query.licensePlate" clearable placeholder="车牌号码" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.licensePlate" clearable size="small" placeholder="车牌号码" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <label class="el-form-item-label">垫付方式</label>
-        <el-input v-model="query.buyType" clearable placeholder="垫付方式" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
-        <date-range-picker
-          v-model="query.price"
-          start-placeholder="priceStart"
-          end-placeholder="priceStart"
-          class="date-item"
-        />
+        <el-select v-model="query.buyType" placeholder="垫付方式" clearable size="small" class="filter-item" style="width: 110px" @change="toQuery">
+          <el-option
+            v-for="item in dict.buy_vehicle_channel_type"
+            :key="item.id"
+            :label="item.label"
+            :value="item.value" />
+        </el-select>
         <date-range-picker
           v-model="query.buyTime"
-          start-placeholder="buyTimeStart"
-          end-placeholder="buyTimeStart"
+          start-placeholder="购买启始时间"
+          end-placeholder="购买结束时间"
           class="date-item"
         />
+
         <rrOperation :crud="crud" />
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
@@ -109,6 +110,7 @@
 
 <script>
 import crudVehicleBuyRecord from '@/api/system/vehicleBuyRecord'
+import DateRangePicker from '@/components/DateRangePicker'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -120,7 +122,7 @@ const defaultForm = { source: null, price: null, user: { id: null }, vehicleType
 
 export default {
   name: 'VehicleBuyRecord',
-  components: { pagination, crudOperation, rrOperation, udOperation },
+  components: { pagination, crudOperation, rrOperation, udOperation, DateRangePicker },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   dicts: ['buy_vehicle_channel_type'],
   cruds() {
@@ -150,12 +152,7 @@ export default {
         { key: 'vehicleType', display_name: '车辆类型' },
         { key: 'licensePlate', display_name: '车牌号码' },
         { key: 'buyType', display_name: '垫付方式' }
-      ],
-      userList: [],
-      query: {
-        // 其他查询条件
-        username: '' // 添加username字段，用于存储用户名称搜索条件
-      }
+      ]
     }
   },
   methods: {
