@@ -71,9 +71,22 @@
                 :value="item.value" />
             </el-select>
           </el-form-item>
-          <el-form-item label="逗号拼接，文件存储的id">
+          <el-form-item label="文件上传">
             <el-input v-model="form.imgPath" style="width: 370px;" />
           </el-form-item>
+          <div>
+            <!-- 新增 -->
+            <el-button
+              slot="left"
+              v-permission="['admin','storage:add']"
+              class="filter-item"
+              size="mini"
+              type="primary"
+              icon="el-icon-upload"
+              @click="crud.toAdd"
+            >上传
+            </el-button>
+          </div>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button type="text" @click="crud.cancelCU">取消</el-button>
@@ -139,19 +152,18 @@ import udOperation from '@crud/UD.operation'
 import pagination from '@crud/Pagination'
 import userService from '@/api/system/user.js'
 import { mapGetters } from 'vuex'
-import { computed, onMounted, ref, watch } from 'vue'
 
 const defaultForm = { source: null, price: null, user: { id: null }, vehicleType: null, licensePlate: null, buyTime: null, buyType: null }
 
 export default {
   name: 'VehicleBuyRecord',
   components: { pagination, crudOperation, rrOperation, udOperation, DateRangePicker },
+  mixins: [presenter(), header(), form(defaultForm), crud()],
   computed: {
     ...mapGetters([
       'baseApi'
     ])
   },
-  mixins: [presenter(), header(), form(defaultForm), crud()],
   dicts: ['buy_vehicle_channel_type'],
   cruds() {
     return CRUD({ title: 'vehicleBuyRecordService', url: 'api/vehicleBuyRecord', idField: 'id', sort: 'id,desc', crudMethod: { ...crudVehicleBuyRecord }})
@@ -173,8 +185,6 @@ export default {
       return `${baseApi}/file/${localStorages[0].type}/${localStorages[0].realName}`
     }
 
-    const srcList = ref([])
-
     const previewSrcList = (localStorages, baseApi) => {
       // console.log(localStorages)
       if (!localStorages) {
@@ -189,7 +199,7 @@ export default {
       return res
     }
 
-    return { getUserData, previewSrcList, url, srcList }
+    return { getUserData, previewSrcList, url }
   },
 
   data() {
