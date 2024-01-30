@@ -5,15 +5,15 @@
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <label class="el-form-item-label">来源</label>
-        <el-input v-model="query.source" clearable size="small" placeholder="来源" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.source" clearable size="small" placeholder="来源" style="width: 185px;" class="filter-item"  />
         <label class="el-form-item-label">用户名称</label>
-        <el-input v-model="query.userName" clearable size="small" placeholder="用户名称" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.userName" clearable size="small" placeholder="用户名称" style="width: 185px;" class="filter-item"  />
         <label class="el-form-item-label">车辆类型</label>
-        <el-input v-model="query.vehicleType" clearable size="small" placeholder="车辆类型" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.vehicleType" clearable size="small" placeholder="车辆类型" style="width: 185px;" class="filter-item"  />
         <label class="el-form-item-label">车牌号码</label>
-        <el-input v-model="query.licensePlate" clearable size="small" placeholder="车牌号码" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.licensePlate" clearable size="small" placeholder="车牌号码" style="width: 185px;" class="filter-item"  />
         <label class="el-form-item-label">垫付方式</label>
-        <el-select v-model="query.buyType" placeholder="垫付方式" clearable size="small" class="filter-item" style="width: 110px" @change="toQuery">
+        <el-select v-model="query.buyType" placeholder="垫付方式" clearable size="small" class="filter-item" style="width: 110px">
           <el-option
             v-for="item in dict.buy_vehicle_channel_type"
             :key="item.id"
@@ -46,7 +46,7 @@
               :fetch-suggestions="getUserData"
               placeholder="请输入需要搜索的用户名称"
               style="width: 370px;"
-              @select="handleSelect"
+              @select="handleSelectUserId"
             >
             <template v-slot="{ item }">
               <div class="name">{{ item.nickName }}</div>
@@ -71,6 +71,9 @@
                 :value="item.value" />
             </el-select>
           </el-form-item>
+          <el-form-item label="逗号拼接，文件存储的id">
+            <el-input v-model="form.imgPath" style="width: 370px;" />
+          </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button type="text" @click="crud.cancelCU">取消</el-button>
@@ -93,8 +96,26 @@
             {{ dict.label.buy_vehicle_channel_type[scope.row.buyType] }}
           </template>
         </el-table-column>
+        <el-table-column prop="preview" label="预览图">
+          <template v-slot="scope">
+            <el-image
+              :src="url(scope.row.localStorages, baseApi)"
+              :preview-src-list="previewSrcList(scope.row.localStorages, baseApi)"
+              fit="cover"
+              style="width: 90px; height: 90px"
+              :zoom-rate="1.2"
+              :max-scale="7"
+              :min-scale="0.2"
+              class="el-avatar"
+            >
+            <div slot="error">
+              <i class="el-icon-document" />
+            </div>
+            </el-image>
+          </template>
+        </el-table-column>
         <el-table-column v-if="checkPer(['admin','vehicleBuyRecord:edit','vehicleBuyRecord:del'])" label="操作" width="150px" align="center">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <udOperation
               :data="scope.row"
               :permission="permission"
@@ -111,22 +132,32 @@
 <script>
 import crudVehicleBuyRecord from '@/api/system/vehicleBuyRecord'
 import DateRangePicker from '@/components/DateRangePicker'
-import CRUD, { presenter, header, form, crud } from '@crud/crud'
+import CRUD, { crud, form, header, presenter } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
 import udOperation from '@crud/UD.operation'
 import pagination from '@crud/Pagination'
 import userService from '@/api/system/user.js'
+import { mapGetters } from 'vuex'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const defaultForm = { source: null, price: null, user: { id: null }, vehicleType: null, licensePlate: null, buyTime: null, buyType: null }
 
 export default {
   name: 'VehicleBuyRecord',
   components: { pagination, crudOperation, rrOperation, udOperation, DateRangePicker },
+  computed: {
+    ...mapGetters([
+      'baseApi'
+    ])
+  },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   dicts: ['buy_vehicle_channel_type'],
   cruds() {
     return CRUD({ title: 'vehicleBuyRecordService', url: 'api/vehicleBuyRecord', idField: 'id', sort: 'id,desc', crudMethod: { ...crudVehicleBuyRecord }})
+  },
+  created() {
+    console.log('create 加载')
   },
   setup() {
     const getUserData = async(userName, cb) => {
@@ -135,8 +166,32 @@ export default {
       cb(response.content)
     }
 
-    return { getUserData }
+    const url = (localStorages, baseApi) => {
+      if (!localStorages || localStorages.length === 0) {
+        return ''
+      }
+      return `${baseApi}/file/${localStorages[0].type}/${localStorages[0].realName}`
+    }
+
+    const srcList = ref([])
+
+    const previewSrcList = (localStorages, baseApi) => {
+      // console.log(localStorages)
+      if (!localStorages) {
+        return []
+      }
+      // 请求接口获取信息并组装成http link字符串
+      const res = localStorages.map((ls) => {
+        // console.log(ls)
+        return `${baseApi}/file/${ls.type}/${ls.realName}`
+      })
+      // console.log(res)
+      return res
+    }
+
+    return { getUserData, previewSrcList, url, srcList }
   },
+
   data() {
     return {
       permission: {
@@ -156,8 +211,12 @@ export default {
     }
   },
   methods: {
-    handleSelect(item) {
-      console.log('Clicked Item:', item)
+    // 钩子：在获取表格数据之前执行，false 则代表不获取数据
+    [CRUD.HOOK.beforeRefresh]() {
+      return true
+    },
+    handleSelectUserId(item) {
+      // console.log('Clicked Item:', item)
       this.form.user.id = item.id
       // this.form.userName = item.nickName
     }
