@@ -12,8 +12,8 @@
         <el-input v-model="query.vehicleType" clearable size="small" placeholder="车辆类型" style="width: 185px;" class="filter-item"  />
         <label class="el-form-item-label">车牌号码</label>
         <el-input v-model="query.licensePlate" clearable size="small" placeholder="车牌号码" style="width: 185px;" class="filter-item"  />
-        <label class="el-form-item-label">垫付方式</label>
-        <el-select v-model="query.buyType" placeholder="垫付方式" clearable size="small" class="filter-item" style="width: 110px">
+        <label class="el-form-item-label">支付方式</label>
+        <el-select v-model="query.buyType" placeholder="支付方式" clearable size="small" class="filter-item" style="width: 110px">
           <el-option
             v-for="item in dict.buy_vehicle_channel_type"
             :key="item.id"
@@ -32,7 +32,7 @@
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
       <!--表单组件-->
-      <el-dialog :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="500px">
+      <el-dialog :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="'车辆录入'" width="500px">
         <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
           <el-form-item label="来源">
             <el-input v-model="form.source" style="width: 370px;" />
@@ -40,18 +40,21 @@
           <el-form-item label="价格">
             <el-input v-model="form.price" :rows="3" type="textarea" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="用户ID">
+          <el-form-item label="用户名称">
             <el-autocomplete
-              v-model="form.user.id"
+              v-model="form.user.name"
               :fetch-suggestions="getUserData"
               placeholder="请输入需要搜索的用户名称"
               style="width: 370px;"
               @select="handleSelectUserId"
             >
-            <template v-slot="{ item }">
-              <div class="name">{{ item.nickName }}</div>
-            </template>
+              <template v-slot="{ item }">
+                <div class="name">{{ item.nickName }}</div>
+              </template>
             </el-autocomplete>
+          </el-form-item>
+          <el-form-item :hidden="true" label="用户ID">
+            <el-input v-model="form.user.id" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="车辆类型">
             <el-input v-model="form.vehicleType" style="width: 370px;" />
@@ -62,7 +65,7 @@
           <el-form-item label="购买时间">
             <el-date-picker v-model="form.buyTime" type="datetime" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="垫付方式">
+          <el-form-item label="支付方式">
             <el-select v-model="form.buyType" filterable placeholder="请选择">
               <el-option
                 v-for="item in dict.buy_vehicle_channel_type"
@@ -111,7 +114,7 @@
         <el-table-column prop="vehicleType" label="车辆类型" />
         <el-table-column prop="licensePlate" label="车牌号码" />
         <el-table-column prop="buyTime" label="购买时间" />
-        <el-table-column prop="buyType" label="垫付方式">
+        <el-table-column prop="buyType" label="支付方式">
           <template v-slot="scope">
             {{ dict.label.buy_vehicle_channel_type[scope.row.buyType] }}
           </template>
@@ -226,7 +229,7 @@ export default {
         { key: 'userId', display_name: '用户id' },
         { key: 'vehicleType', display_name: '车辆类型' },
         { key: 'licensePlate', display_name: '车牌号码' },
-        { key: 'buyType', display_name: '垫付方式' }
+        { key: 'buyType', display_name: '支付方式' }
       ]
     }
   },
@@ -237,7 +240,8 @@ export default {
     // },
     handleSelectUserId(item) {
       // console.log('Clicked Item:', item)
-      this.form.user.id = item.id
+      this.form.user.id = item.id + ''
+      this.form.user.name = item.nickName + ''
       // this.form.userName = item.nickName
     },
     upload() {
