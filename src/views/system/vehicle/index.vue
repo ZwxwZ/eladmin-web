@@ -71,21 +71,27 @@
                 :value="item.value" />
             </el-select>
           </el-form-item>
-          <el-form-item label="文件上传">
+          <el-form-item :hidden="true" label="文件上传">
             <el-input v-model="form.imgPath" style="width: 370px;" />
           </el-form-item>
           <div>
-            <!-- 新增 -->
-            <el-button
-              slot="left"
-              v-permission="['admin','storage:add']"
-              class="filter-item"
-              size="mini"
-              type="primary"
-              icon="el-icon-upload"
-              @click="crud.toAdd"
-            >上传
-            </el-button>
+            <template>
+              <el-upload
+                ref="upload"
+                class="upload-demo"
+                :action="uploadUrl(fileUploadApi)"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                :before-upload="beforeUpload"
+                :headers="headers"
+                :on-success="handleSuccess"
+                :on-error="handleError"
+                :file-list="fileList"
+                list-type="picture">
+                <el-button size="small" type="primary">点击上传</el-button>
+                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过50mb</div>
+              </el-upload>
+            </template>
           </div>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -93,6 +99,7 @@
           <el-button :loading="crud.status.cu === 2" type="primary" @click="crud.submitCU">确认</el-button>
         </div>
       </el-dialog>
+
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
         <el-table-column type="selection" width="55" />
@@ -152,6 +159,7 @@ import udOperation from '@crud/UD.operation'
 import pagination from '@crud/Pagination'
 import userService from '@/api/system/user.js'
 import { mapGetters } from 'vuex'
+import { getToken } from '@/utils/auth'
 
 const defaultForm = { source: null, price: null, user: { id: null }, vehicleType: null, licensePlate: null, buyTime: null, buyType: null }
 
@@ -161,20 +169,18 @@ export default {
   mixins: [presenter(), header(), form(defaultForm), crud()],
   computed: {
     ...mapGetters([
-      'baseApi'
+      'baseApi',
+      'fileUploadApi'
     ])
   },
   dicts: ['buy_vehicle_channel_type'],
   cruds() {
     return CRUD({ title: 'vehicleBuyRecordService', url: 'api/vehicleBuyRecord', idField: 'id', sort: 'id,desc', crudMethod: { ...crudVehicleBuyRecord }})
   },
-  created() {
-    console.log('create 加载')
-  },
   setup() {
     const getUserData = async(userName, cb) => {
       const response = await userService.getByUserName(userName)
-      console.log(response.content)
+      // console.log(response.content)
       cb(response.content)
     }
 
@@ -204,11 +210,15 @@ export default {
 
   data() {
     return {
+      headers: { 'Authorization': getToken() },
       permission: {
         add: ['admin', 'vehicleBuyRecord:add'],
         edit: ['admin', 'vehicleBuyRecord:edit'],
         del: ['admin', 'vehicleBuyRecord:del']
       },
+      fileList: [],
+      loading: false,
+      uploadFilename: '',
       rules: {
       },
       queryTypeOptions: [
@@ -222,13 +232,56 @@ export default {
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
-    [CRUD.HOOK.beforeRefresh]() {
-      return true
-    },
+    // [CRUD.HOOK.beforeRefresh]() {
+    //   return true
+    // },
     handleSelectUserId(item) {
       // console.log('Clicked Item:', item)
       this.form.user.id = item.id
       // this.form.userName = item.nickName
+    },
+    upload() {
+      this.$refs.upload.submit()
+    },
+    beforeUpload(file) {
+      let isLt2M = true
+      isLt2M = file.size / 1024 / 1024 < 100
+      if (!isLt2M) {
+        this.loading = false
+        this.$message.error('上传文件大小不能超过 100MB!')
+      }
+      // console.log('upload name: ' + file.name)
+      this.uploadFilename = file.name
+      return isLt2M
+    },
+    handleSuccess(response, file, fileList) {
+      // console.log(this.crud.form.imgPath)
+      if (!this.crud.form.imgPath) {
+        this.crud.form.imgPath = ''
+      }
+      // console.log(this.crud.form.imgPath)
+      this.crud.form.imgPath += this.crud.form.imgPath ? ',' + response.id : response.id + ''
+      // console.log(this.crud.form.imgPath)
+      this.crud.notify('上传成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+    },
+    // 监听上传失败
+    handleError(e, file, fileList) {
+      const msg = JSON.parse(e.message)
+      this.$notify({
+        title: msg.message,
+        type: 'error',
+        duration: 2500
+      })
+      this.loading = false
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList)
+    },
+    handlePreview(file) {
+      console.log(file)
+    },
+    uploadUrl(fileUploadApi) {
+      return fileUploadApi + '?name=' + this.uploadFilename
     }
   }
 }
