@@ -92,7 +92,7 @@
                 :file-list="fileList"
                 list-type="picture">
                 <el-button size="small" type="primary">点击上传</el-button>
-                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过50mb</div>
+                <div slot="tip" class="el-upload__tip">只能上传格式为jpg/jpeg/png/gif/bmp/svg/webp的文件，且不超过50mb</div>
               </el-upload>
             </template>
           </div>
@@ -249,10 +249,23 @@ export default {
     },
     beforeUpload(file) {
       let isLt2M = true
-      isLt2M = file.size / 1024 / 1024 < 100
+      // 将文件名转换为小写以确保匹配不区分大小写
+      const lowerCaseFileName = file.name.toLowerCase()
+      // 定义支持的图片文件后缀
+      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', 'webp']
+      // 检查文件名是否以支持的图片文件后缀之一结尾
+      isLt2M = imageExtensions.some(extension => lowerCaseFileName.endsWith(extension))
       if (!isLt2M) {
         this.loading = false
-        this.$message.error('上传文件大小不能超过 100MB!')
+        this.$message.error('上传文件只能是图片')
+        return isLt2M
+      }
+
+      isLt2M = file.size / 1024 / 1024 < 50
+      if (!isLt2M) {
+        this.loading = false
+        this.$message.error('上传文件大小不能超过 50MB!')
+        return isLt2M
       }
       // console.log('upload name: ' + file.name)
       this.uploadFilename = file.name
