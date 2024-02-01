@@ -77,29 +77,31 @@
           <el-form-item :hidden="true" label="文件上传">
             <el-input v-model="form.imgPath" style="width: 370px;" />
           </el-form-item>
-          <div>
-            <template>
-              <el-upload
-                ref="upload"
-                class="upload-demo"
-                :action="uploadUrl(fileUploadApi)"
-                :on-preview="handlePreview"
-                :on-remove="handleRemove"
-                :before-upload="beforeUpload"
-                :headers="headers"
-                :on-success="handleSuccess"
-                :on-error="handleError"
-                :file-list="fileList"
-                list-type="picture">
-                <el-button size="small" type="primary">点击上传</el-button>
-                <div slot="tip" class="el-upload__tip">只能上传格式为jpg/jpeg/png/gif/bmp/svg/webp的文件，且不超过50mb</div>
-              </el-upload>
-            </template>
-          </div>
+          <el-form-item label="车辆内饰">
+            <div>
+              <template>
+                <el-upload
+                  ref="upload"
+                  class="upload-demo"
+                  :action="uploadUrl(fileUploadApi)"
+                  :on-preview="handlePreview"
+                  :on-remove="handleRemove"
+                  :before-upload="beforeUpload"
+                  :headers="headers"
+                  :on-success="handleSuccess"
+                  :on-error="handleError"
+                  :file-list="form.imgFileList">
+                  <el-button size="small" type="primary">点击上传</el-button>
+                  <div slot="tip" class="el-upload__tip">支持格式:jpg/jpeg/png/gif/bmp/svg/webp，且不超过50mb</div>
+                </el-upload>
+              </template>
+            </div>
+          </el-form-item>
+
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button type="text" @click="crud.cancelCU">取消</el-button>
-          <el-button :loading="crud.status.cu === 2" type="primary" @click="crud.submitCU">确认</el-button>
+          <el-button type="text" @click="cancelForm()">取消</el-button>
+          <el-button :loading="crud.status.cu === 2" type="primary" @click="sumitForm()">确认</el-button>
         </div>
       </el-dialog>
 
@@ -110,6 +112,7 @@
         <el-table-column prop="source" label="来源" />
         <el-table-column prop="price" label="价格" />
         <el-table-column prop="userName" label="用户名称" />
+        <el-table-column :hidden="true" prop="userId" label="用户id" />
         <el-table-column prop="department" label="部门" />
         <el-table-column prop="vehicleType" label="车辆类型" />
         <el-table-column prop="licensePlate" label="车牌号码" />
@@ -119,6 +122,7 @@
             {{ dict.label.buy_vehicle_channel_type[scope.row.buyType] }}
           </template>
         </el-table-column>
+        <el-table-column :hidden="true" prop="imgPath" label="图片ids"/>
         <el-table-column prop="preview" label="预览图">
           <template v-slot="scope">
             <el-image
@@ -140,7 +144,7 @@
         <el-table-column v-if="checkPer(['admin','vehicleBuyRecord:edit','vehicleBuyRecord:del'])" label="操作" width="150px" align="center">
           <template v-slot="scope">
             <udOperation
-              :data="scope.row"
+              :data="passValue(scope.row, baseApi)"
               :permission="permission"
             />
           </template>
@@ -208,7 +212,25 @@ export default {
       return res
     }
 
-    return { getUserData, previewSrcList, url }
+    const passValue = (row, baseApi) => {
+      if (!row['user']) {
+        row['user'] = {}
+      }
+      row['user']['name'] = row.userName
+      // console.log(row.userId)
+      row['user']['id'] = row.userId
+      if (!row.localStorages) {
+        row.imgFileList = []
+      } else {
+        // imgFileList放的是对象，由上面标签生成的
+        row.imgFileList = row.localStorages.map((ls) => {
+          return { name: `${ls.name}`, url: `${baseApi}/file/${ls.type}/${ls.realName}`, id: `${ls.id}` }
+        })
+      }
+      return row
+    }
+
+    return { getUserData, previewSrcList, url, passValue }
   },
 
   data() {
@@ -219,7 +241,6 @@ export default {
         edit: ['admin', 'vehicleBuyRecord:edit'],
         del: ['admin', 'vehicleBuyRecord:del']
       },
-      fileList: [],
       loading: false,
       uploadFilename: '',
       rules: {
@@ -271,7 +292,7 @@ export default {
       this.uploadFilename = file.name
       return isLt2M
     },
-    handleSuccess(response, file, fileList) {
+    handleSuccess(response, file, imgFileList) {
       // console.log(this.crud.form.imgPath)
       if (!this.crud.form.imgPath) {
         this.crud.form.imgPath = ''
@@ -282,7 +303,7 @@ export default {
       this.crud.notify('上传成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
     },
     // 监听上传失败
-    handleError(e, file, fileList) {
+    handleError(e, file, imgFileList) {
       const msg = JSON.parse(e.message)
       this.$notify({
         title: msg.message,
@@ -291,14 +312,31 @@ export default {
       })
       this.loading = false
     },
-    handleRemove(file, fileList) {
-      console.log(file, fileList)
+    handleRemove(file, imgFileList) {
+      console.log(file, imgFileList)
+      this.crud.form.imgPath = this.removeValueFromString(this.crud.form.imgPath, file.id)
     },
     handlePreview(file) {
       console.log(file)
     },
     uploadUrl(fileUploadApi) {
       return fileUploadApi + '?name=' + this.uploadFilename
+    },
+    removeValueFromString(inputString, valueToRemove) {
+      // 将逗号分隔的字符串拆分成数组
+      const valuesArray = inputString.split(',')
+      // 移除特定的值
+      const filteredArray = valuesArray.filter(value => value.trim() !== valueToRemove.trim())
+      // 将数组重新连接成字符串，使用逗号分隔
+      return filteredArray.join(',')
+    },
+    cancelForm() {
+      this.crud.cancelCU()
+      this.crud.form.imgFileList = []
+    },
+    sumitForm() {
+      this.crud.submitCU()
+      this.crud.form.imgFileList = []
     }
   }
 }
