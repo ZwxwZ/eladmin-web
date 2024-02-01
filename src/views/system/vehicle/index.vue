@@ -37,8 +37,15 @@
           <el-form-item label="来源">
             <el-input v-model="form.source" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="价格">
-            <el-input v-model="form.price" :rows="3" type="textarea" style="width: 370px;" />
+          <el-form-item
+                        label="价格"
+                        prop="price"
+                        :rules="[
+                              { required: true, message: '价格不能为空'},
+                              { type: 'number', message: '价格必须为数字值'}
+                             ]"
+          >
+            <el-input v-model.number="form.price" :rows="3" type="textarea" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="用户名称">
             <el-autocomplete
@@ -90,6 +97,8 @@
                   :headers="headers"
                   :on-success="handleSuccess"
                   :on-error="handleError"
+                  :multiple="true"
+                  :limit="50"
                   :file-list="form.imgFileList">
                   <el-button size="small" type="primary">点击上传</el-button>
                   <div slot="tip" class="el-upload__tip">支持格式:jpg/jpeg/png/gif/bmp/svg/webp，且不超过50mb</div>
@@ -122,7 +131,7 @@
             {{ dict.label.buy_vehicle_channel_type[scope.row.buyType] }}
           </template>
         </el-table-column>
-        <el-table-column :hidden="true" prop="imgPath" label="图片ids"/>
+        <el-table-column v-if="false" prop="imgPath" label="图片ids"/>
         <el-table-column prop="preview" label="预览图">
           <template v-slot="scope">
             <el-image
