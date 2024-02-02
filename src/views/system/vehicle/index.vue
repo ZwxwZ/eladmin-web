@@ -30,21 +30,21 @@
         <rrOperation :crud="crud" />
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
-      <crudOperation :permission="permission" />
+      <crudOperation :permission="permission" :hidden-columns="['imgPath']" />
       <!--表单组件-->
-      <el-dialog :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="'车辆录入'" width="500px">
+      <el-dialog
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :before-close="crud.cancelCU"
+        :visible.sync="crud.status.cu > 0"
+        :title="'车辆录入'"
+        width="500px"
+      >
         <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
           <el-form-item label="来源">
             <el-input v-model="form.source" style="width: 370px;" />
           </el-form-item>
-          <el-form-item
-                        label="价格"
-                        prop="price"
-                        :rules="[
-                              { required: true, message: '价格不能为空'},
-                              { type: 'number', message: '价格必须为数字值'}
-                             ]"
-          >
+          <el-form-item label="价格" prop="price">
             <el-input v-model.number="form.price" :rows="3" type="textarea" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="用户名称">
@@ -103,6 +103,9 @@
                   <el-button size="small" type="primary">点击上传</el-button>
                   <div slot="tip" class="el-upload__tip">支持格式:jpg/jpeg/png/gif/bmp/svg/webp，且不超过50mb</div>
                 </el-upload>
+                <el-dialog :close-on-press-escape="false" :close-on-click-modal="false" :visible.sync="dialogVisible" :modal="false">
+                  <img width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
               </template>
             </div>
           </el-form-item>
@@ -131,7 +134,7 @@
             {{ dict.label.buy_vehicle_channel_type[scope.row.buyType] }}
           </template>
         </el-table-column>
-        <el-table-column v-if="false" prop="imgPath" label="图片ids"/>
+        <el-table-column prop="imgPath" label="图片ids"/>
         <el-table-column prop="preview" label="预览图">
           <template v-slot="scope">
             <el-image
@@ -245,6 +248,8 @@ export default {
   data() {
     return {
       headers: { 'Authorization': getToken() },
+      dialogImageUrl: '',
+      dialogVisible: false,
       permission: {
         add: ['admin', 'vehicleBuyRecord:add'],
         edit: ['admin', 'vehicleBuyRecord:edit'],
@@ -253,6 +258,10 @@ export default {
       loading: false,
       uploadFilename: '',
       rules: {
+        price: [
+          { required: true, message: '价格不能为空' },
+          { type: 'number', message: '价格必须为数字值' }
+        ]
       },
       queryTypeOptions: [
         { key: 'source', display_name: '来源' },
@@ -327,6 +336,8 @@ export default {
     },
     handlePreview(file) {
       console.log(file)
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
     },
     uploadUrl(fileUploadApi) {
       return fileUploadApi + '?name=' + this.uploadFilename
