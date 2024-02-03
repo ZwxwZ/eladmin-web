@@ -30,7 +30,7 @@
         <rrOperation :crud="crud" />
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
-      <crudOperation :permission="permission" :hidden-columns="['imgPath']" />
+      <crudOperation :permission="permission" :hidden-columns="['userId', 'imgPath']" />
       <!--表单组件-->
       <el-dialog
         :close-on-click-modal="false"
@@ -44,10 +44,10 @@
           <el-form-item label="来源">
             <el-input v-model="form.source" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="价格" prop="price">
+          <el-form-item label="购入价格" prop="price">
             <el-input v-model.number="form.price" :rows="3" type="textarea" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="用户名称">
+          <el-form-item label="经办用户名称">
             <el-autocomplete
               v-model="form.user.name"
               :fetch-suggestions="getUserData"
@@ -60,7 +60,7 @@
               </template>
             </el-autocomplete>
           </el-form-item>
-          <el-form-item :hidden="true" label="用户ID">
+          <el-form-item prop="userId" label="用户ID">
             <el-input v-model="form.user.id" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="车辆类型">
@@ -123,7 +123,7 @@
         <el-table-column prop="id" label="ID" />
         <el-table-column prop="source" label="来源" />
         <el-table-column prop="price" label="价格" />
-        <el-table-column prop="userName" label="用户名称" />
+        <el-table-column prop="userName" label="经办用户名称" />
         <el-table-column :hidden="true" prop="userId" label="用户id" />
         <el-table-column prop="department" label="部门" />
         <el-table-column prop="vehicleType" label="车辆类型" />
