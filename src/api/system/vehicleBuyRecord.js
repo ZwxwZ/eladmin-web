@@ -24,4 +24,11 @@ export function edit(data) {
   })
 }
 
-export default { add, edit, del }
+export function searchCarName(carName) {
+  return request({
+    url: 'api/vehicleBuyRecord' + '?page=0&size=10&blurry=' + carName,
+    method: 'get'
+  })
+}
+
+export default { add, edit, del, searchCarName }
