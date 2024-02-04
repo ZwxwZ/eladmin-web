@@ -30,7 +30,7 @@
         <rrOperation :crud="crud" />
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
-      <crudOperation :permission="permission" :hidden-columns="['userId', 'imgPath']" />
+      <crudOperation :permission="permission" :hidden-columns="['userId', 'imgPath','department']" />
       <!--表单组件-->
       <el-dialog
         :close-on-click-modal="false"
