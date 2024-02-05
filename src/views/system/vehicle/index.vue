@@ -5,15 +5,18 @@
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <label class="el-form-item-label">来源</label>
-        <el-input v-model="query.source" clearable size="small" placeholder="来源" style="width: 185px;" class="filter-item"  />
+        <el-input v-model="query.source" clearable size="small" placeholder="来源" style="width: 185px;" class="filter-item"  @keyup.enter.native="crud.toQuery"  />
         <label class="el-form-item-label">用户名称</label>
-        <el-input v-model="query.userName" clearable size="small" placeholder="用户名称" style="width: 185px;" class="filter-item"  />
+        <el-input v-model="query.userName" clearable size="small" placeholder="用户名称" style="width: 185px;" class="filter-item"  @keyup.enter.native="crud.toQuery"  />
         <label class="el-form-item-label">车辆类型</label>
-        <el-input v-model="query.vehicleType" clearable size="small" placeholder="车辆类型" style="width: 185px;" class="filter-item"  />
+        <el-input v-model="query.vehicleType" clearable size="small" placeholder="车辆类型" style="width: 185px;" class="filter-item"  @keyup.enter.native="crud.toQuery"  />
         <label class="el-form-item-label">车牌号码</label>
-        <el-input v-model="query.licensePlate" clearable size="small" placeholder="车牌号码" style="width: 185px;" class="filter-item"  />
+        <el-input v-model="query.licensePlate" clearable size="small" placeholder="车牌号码" style="width: 185px;" class="filter-item"  @keyup.enter.native="crud.toQuery"  />
+        <br>
+        <label class="el-form-item-label">车辆概述</label>
+        <el-input v-model="query.descr" clearable placeholder="车辆概述" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <label class="el-form-item-label">支付方式</label>
-        <el-select v-model="query.buyType" placeholder="支付方式" clearable size="small" class="filter-item" style="width: 110px">
+        <el-select v-model="query.buyType" placeholder="支付方式" clearable size="small" class="filter-item" style="width: 110px"  @keyup.enter.native="crud.toQuery" >
           <el-option
             v-for="item in dict.buy_vehicle_channel_type"
             :key="item.id"
@@ -60,7 +63,7 @@
               </template>
             </el-autocomplete>
           </el-form-item>
-          <el-form-item prop="userId" label="用户ID">
+          <el-form-item :hidden="true" prop="userId" label="用户ID">
             <el-input v-model="form.user.id" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="车辆类型">
@@ -81,10 +84,13 @@
                 :value="item.value" />
             </el-select>
           </el-form-item>
+          <el-form-item label="车辆概述">
+            <el-input v-model="form.descr" :rows="3" type="textarea" style="width: 370px;" />
+          </el-form-item>
           <el-form-item :hidden="true" label="文件上传">
             <el-input v-model="form.imgPath" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="车辆内饰">
+          <el-form-item label="图片信息">
             <div>
               <template>
                 <el-upload
@@ -119,6 +125,15 @@
 
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
+        <el-table-column type="expand">
+          <template v-slot="scope">
+            <el-form label-position="left" label-width="auto" inline class="table-expand">
+              <el-form-item label="商品描述">
+                <span>{{ scope.row.descr }}</span>
+              </el-form-item>
+            </el-form>
+          </template>
+        </el-table-column>
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" />
         <el-table-column prop="source" label="来源" />
@@ -268,15 +283,16 @@ export default {
         { key: 'userId', display_name: '用户id' },
         { key: 'vehicleType', display_name: '车辆类型' },
         { key: 'licensePlate', display_name: '车牌号码' },
-        { key: 'buyType', display_name: '支付方式' }
+        { key: 'buyType', display_name: '支付方式' },
+        { key: 'descr', display_name: '车辆概述' }
       ]
     }
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
-    // [CRUD.HOOK.beforeRefresh]() {
-    //   return true
-    // },
+    [CRUD.HOOK.beforeRefresh]() {
+      return true
+    },
     handleSelectUserId(item) {
       // console.log('Clicked Item:', item)
       this.form.user.id = item.id + ''
@@ -364,5 +380,16 @@ export default {
 </script>
 
 <style scoped>
-
+.table-expand {
+  font-size: 0;
+}
+.table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}
+.table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 100%;
+}
 </style>
