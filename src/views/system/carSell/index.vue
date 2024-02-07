@@ -7,11 +7,29 @@
         <label class="el-form-item-label">商品名称</label>
         <el-input v-model="query.productName" clearable placeholder="商品名称" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <label class="el-form-item-label">付款方式</label>
-        <el-input v-model="query.payType" clearable placeholder="付款方式" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-select v-model="query.payType" placeholder="付款方式" clearable size="small" class="filter-item" style="width: 110px"  @keyup.enter.native="crud.toQuery" >
+          <el-option
+            v-for="item in dict.car_pay_type"
+            :key="item.id"
+            :label="item.label"
+            :value="item.value" />
+        </el-select>
         <label class="el-form-item-label">销售类型</label>
-        <el-input v-model="query.sellType" clearable placeholder="销售类型" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-select v-model="query.sellType" placeholder="销售类型" clearable size="small" class="filter-item" style="width: 110px"  @keyup.enter.native="crud.toQuery" >
+          <el-option
+            v-for="item in dict.car_sell_type"
+            :key="item.id"
+            :label="item.label"
+            :value="item.value" />
+        </el-select>
         <label class="el-form-item-label">过户类型</label>
-        <el-input v-model="query.transferType" clearable placeholder="过户类型" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-select v-model="query.transferType" placeholder="过户类型" clearable size="small" class="filter-item" style="width: 110px"  @keyup.enter.native="crud.toQuery" >
+          <el-option
+            v-for="item in dict.can_transfer_type"
+            :key="item.id"
+            :label="item.label"
+            :value="item.value" />
+        </el-select>
         <div>
           <label class="el-form-item-label">成交价格</label>
           <NumberRange
@@ -211,7 +229,7 @@
         <el-table-column v-if="checkPer(['admin','vehicleSellRecord:edit','vehicleSellRecord:del'])" label="操作" width="150px" align="center">
           <template slot-scope="scope">
             <udOperation
-              :data="passValue(scope.row, baseApi)"
+              :data="dataEcho(scope.row, baseApi)"
               :permission="permission"
             />
           </template>
@@ -289,13 +307,15 @@ export default {
       return `${baseApi}/file/${localStorage.type}/${localStorage.realName}`
     }
 
-    const passValue = (row, baseApi) => {
+    const dataEcho = (row, baseApi) => {
+      // user echo
       if (!row['user']) {
         row['user'] = {}
       }
       row['user']['name'] = row.userName
       // console.log(row.userId)
       row['user']['id'] = row.userId
+      // fileList echo
       if (!row.files) {
         row.imgFileList = []
       } else {
@@ -310,10 +330,16 @@ export default {
           }
         })
       }
+      // car name echo
+      if (!row.vehicleId) {
+        row.vehicle = ''
+      } else {
+        row.vehicle = row.vehicleBuyRecordDto.vehicleType
+      }
       return row
     }
 
-    return { getCarData, storageUrl, url, passValue }
+    return { getCarData, storageUrl, url, dataEcho }
   },
   data() {
     return {
