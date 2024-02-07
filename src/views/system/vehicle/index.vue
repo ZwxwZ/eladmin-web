@@ -253,7 +253,13 @@ export default {
       } else {
         // imgFileList放的是对象，由上面标签生成的
         row.imgFileList = row.localStorages.map((ls) => {
-          return { name: `${ls.name}`, url: `${baseApi}/file/${ls.type}/${ls.realName}`, id: `${ls.id}` }
+          return {
+            name: `${ls.name}` + '.' + `${ls.suffix}`,
+            url: `${baseApi}/file/${ls.type}/${ls.realName}`,
+            id: `${ls.id}`,
+            type: `${ls.type}`,
+            realName: `${ls.realName}`
+          }
         })
       }
       return row
@@ -350,11 +356,11 @@ export default {
     },
     handleRemove(file, imgFileList) {
       console.log(file, imgFileList)
-      this.crud.form.imgPath = removeValueFromString(this.crud.form.imgPath, file.response.id)
+      this.crud.form.imgPath = removeValueFromString(this.crud.form.imgPath, file.id)
     },
     handlePreview(file) {
       console.log(file)
-      this.dialogImageUrl = `${this.baseApi}/file/${file.response.type}/${file.response.realName}`
+      this.dialogImageUrl = `${this.baseApi}/file/${file.type}/${file.realName}`
       this.dialogVisible = true
     },
     uploadUrl(fileUploadApi) {
@@ -363,9 +369,11 @@ export default {
     cancelForm() {
       this.crud.cancelCU()
       this.crud.form.imgFileList = []
+      this.crud.form.imgPath = ''
     },
     sumitForm() {
       this.crud.submitCU()
+      this.crud.form.imgPath = ''
       this.crud.form.imgFileList = []
     }
   }

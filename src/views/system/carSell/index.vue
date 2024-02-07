@@ -131,8 +131,8 @@
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button type="text" @click="crud.cancelCU">取消</el-button>
-          <el-button :loading="crud.status.cu === 2" type="primary" @click="crud.submitCU">确认</el-button>
+          <el-button type="text" @click="cancelForm()">取消</el-button>
+          <el-button :loading="crud.status.cu === 2" type="primary" @click="sumitForm()">确认</el-button>
         </div>
       </el-dialog>
       <!--表格渲染-->
@@ -211,7 +211,7 @@
         <el-table-column v-if="checkPer(['admin','vehicleSellRecord:edit','vehicleSellRecord:del'])" label="操作" width="150px" align="center">
           <template slot-scope="scope">
             <udOperation
-              :data="scope.row"
+              :data="passValue(scope.row, baseApi)"
               :permission="permission"
             />
           </template>
@@ -289,7 +289,31 @@ export default {
       return `${baseApi}/file/${localStorage.type}/${localStorage.realName}`
     }
 
-    return { getCarData, storageUrl, url }
+    const passValue = (row, baseApi) => {
+      if (!row['user']) {
+        row['user'] = {}
+      }
+      row['user']['name'] = row.userName
+      // console.log(row.userId)
+      row['user']['id'] = row.userId
+      if (!row.files) {
+        row.imgFileList = []
+      } else {
+        // imgFileList放的是对象，由上面标签生成的
+        row.imgFileList = row.files.map((ls) => {
+          return {
+            name: `${ls.name}` + '.' + `${ls.suffix}`,
+            url: `${baseApi}/file/${ls.type}/${ls.realName}`,
+            id: `${ls.id}`,
+            type: `${ls.type}`,
+            realName: `${ls.realName}`
+          }
+        })
+      }
+      return row
+    }
+
+    return { getCarData, storageUrl, url, passValue }
   },
   data() {
     return {
@@ -359,7 +383,7 @@ export default {
       if (!this.crud.form.filePath) {
         this.crud.form.filePath = ''
       }
-      // console.log(this.crud.form.filePath)
+      // console.log(response)
       this.crud.form.filePath += this.crud.form.filePath ? ',' + response.id : response.id + ''
       // console.log(this.crud.form.filePath)
       this.crud.notify('上传成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
@@ -376,7 +400,7 @@ export default {
     },
     handleRemove(file, imgFileList) {
       console.log(file)
-      this.crud.form.filePath = removeValueFromString(this.crud.form.filePath, file.response.id)
+      this.crud.form.filePath = removeValueFromString(this.crud.form.filePath, file.id)
     },
     handlePreview(file) {
       console.log(file)
@@ -388,11 +412,21 @@ export default {
       const isImg = imageExtensions.some(extension => lowerCaseFileName.endsWith(extension))
       if (!isImg) {
         this.loading = false
-        this.$message.error('文件无法打开')
+        this.$message.error(lowerCaseFileName + '格式文件无法打开')
       } else {
-        this.dialogImageUrl = this.storageUrl(file.response, this.baseApi)
+        this.dialogImageUrl = this.storageUrl(file, this.baseApi)
         this.dialogVisible = true
       }
+    },
+    cancelForm() {
+      this.crud.cancelCU()
+      this.crud.form.imgFileList = []
+      this.crud.form.filePath = ''
+    },
+    sumitForm() {
+      this.crud.submitCU()
+      this.crud.form.imgFileList = []
+      this.crud.form.filePath = ''
     }
   }
 }
