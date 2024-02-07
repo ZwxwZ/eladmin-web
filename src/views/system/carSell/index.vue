@@ -146,11 +146,25 @@
               <el-form-item label="购入价格">
                 <span>{{ vehicleRecordValue(scope.row, 'price') }}</span>
               </el-form-item>
+              <el-form-item label="收购人">
+                <span>{{ vehicleRecordValue(scope.row, 'userName') }}</span>
+              </el-form-item>
               <el-form-item label="车辆类型">
                 <span>{{ vehicleRecordValue(scope.row, 'vehicleType') }}</span>
               </el-form-item>
               <el-form-item label="车牌号">
                 <span>{{ vehicleRecordValue(scope.row, 'licensePlate') }}</span>
+              </el-form-item>
+              <el-form-item label="销售资料">
+                <div v-for="(ls, index) in scope.row['files']" :key = "index">
+                  <a
+                     class="el-icon-document"
+                     :href="storageUrl(ls, baseApi)"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     :download="ls.name"
+                  >{{ ls.name }}</a>
+                </div>
               </el-form-item>
               <el-form-item label="购买时间">
                 <span>{{ vehicleRecordValue(scope.row, 'buyTime') }}</span>
