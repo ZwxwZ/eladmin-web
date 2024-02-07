@@ -55,6 +55,7 @@
               v-model="form.user.name"
               :fetch-suggestions="getUserData"
               placeholder="请输入需要搜索的用户名称"
+              :trigger-on-focus="false"
               style="width: 370px;"
               @select="handleSelectUserId"
             >
@@ -194,6 +195,7 @@ import pagination from '@crud/Pagination'
 import userService from '@/api/system/user.js'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
+import { removeValueFromString } from '@/utils/upload'
 
 const defaultForm = { source: null, price: null, user: { id: null }, vehicleType: null, licensePlate: null, buyTime: null, buyType: null }
 
@@ -348,23 +350,15 @@ export default {
     },
     handleRemove(file, imgFileList) {
       console.log(file, imgFileList)
-      this.crud.form.imgPath = this.removeValueFromString(this.crud.form.imgPath, file.id)
+      this.crud.form.imgPath = removeValueFromString(this.crud.form.imgPath, file.response.id)
     },
     handlePreview(file) {
       console.log(file)
-      this.dialogImageUrl = file.url
+      this.dialogImageUrl = `${this.baseApi}/file/${file.response.type}/${file.response.realName}`
       this.dialogVisible = true
     },
     uploadUrl(fileUploadApi) {
       return fileUploadApi + '?name=' + this.uploadFilename
-    },
-    removeValueFromString(inputString, valueToRemove) {
-      // 将逗号分隔的字符串拆分成数组
-      const valuesArray = inputString.split(',')
-      // 移除特定的值
-      const filteredArray = valuesArray.filter(value => value.trim() !== valueToRemove.trim())
-      // 将数组重新连接成字符串，使用逗号分隔
-      return filteredArray.join(',')
     },
     cancelForm() {
       this.crud.cancelCU()
