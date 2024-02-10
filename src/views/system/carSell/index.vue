@@ -122,6 +122,23 @@
           <el-form-item label="文件资料ids" :hidden="true" >
             <el-input v-model="form.filePath" style="width: 370px;" />
           </el-form-item>
+          <el-form-item label="销售名称">
+            <el-autocomplete
+              v-model="form.seller.name"
+              :fetch-suggestions="getUserData"
+              placeholder="请输入需要搜索的用户名称"
+              :trigger-on-focus="false"
+              style="width: 370px;"
+              @select="handleSelectUserId"
+            >
+              <template v-slot="{ item }">
+                <div class="name">{{ item.nickName }}</div>
+              </template>
+            </el-autocomplete>
+          </el-form-item>
+          <el-form-item :hidden="true" prop="sellerId" label="用户ID">
+            <el-input v-model="form.seller.id" style="width: 370px;" />
+          </el-form-item>
           <el-form-item label="销售资料">
             <div>
               <template>
@@ -225,7 +242,7 @@
         </el-table-column>
         <el-table-column prop="dealPrice" label="成交价" />
         <el-table-column prop="dealTime" label="成交时间" />
-        <el-table-column prop="vehicleId" label="库存车辆id" />
+        <el-table-column prop="seller.nickName" label="销售人" />
         <el-table-column v-if="checkPer(['admin','vehicleSellRecord:edit','vehicleSellRecord:del'])" label="操作" width="150px" align="center">
           <template slot-scope="scope">
             <udOperation
@@ -254,10 +271,12 @@ import vehicleBuyService from '@/api/system/vehicleBuyRecord'
 import { mapGetters } from 'vuex'
 import { removeValueFromString, uploadUrl } from '@/utils/upload'
 import { getToken } from '@/utils/auth'
+import userService from '@/api/system/user'
 
 const defaultForm = {
   id: null,
   productName: null,
+  seller: { id: null, name: null },
   payType: null,
   sellType: null,
   transferType: null,
@@ -339,7 +358,13 @@ export default {
       return row
     }
 
-    return { getCarData, storageUrl, url, dataEcho }
+    const getUserData = async(userName, cb) => {
+      const response = await userService.getByUserName(userName)
+      // console.log(response.content)
+      cb(response.content)
+    }
+
+    return { getCarData, storageUrl, url, dataEcho, getUserData }
   },
   data() {
     return {
@@ -453,6 +478,11 @@ export default {
       this.crud.submitCU()
       this.crud.form.imgFileList = []
       this.crud.form.filePath = ''
+    },
+    handleSelectUserId(item) {
+      // console.log('Clicked Item:', item)
+      this.form.seller.id = item.id + ''
+      this.form.seller.name = item.nickName + ''
     }
   }
 }
