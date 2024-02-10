@@ -122,7 +122,7 @@
           <el-form-item label="文件资料ids" :hidden="true" >
             <el-input v-model="form.filePath" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="销售名称">
+          <el-form-item label="销售人员名称">
             <el-autocomplete
               v-model="form.seller.name"
               :fetch-suggestions="getUserData"
@@ -328,12 +328,10 @@ export default {
 
     const dataEcho = (row, baseApi) => {
       // user echo
-      if (!row['user']) {
-        row['user'] = {}
+      if (!row['seller']) {
+        row['seller'] = {}
       }
-      row['user']['name'] = row.userName
-      // console.log(row.userId)
-      row['user']['id'] = row.userId
+      row['seller']['name'] = row.seller.nickName
       // fileList echo
       if (!row.files) {
         row.imgFileList = []
@@ -353,7 +351,10 @@ export default {
       if (!row.vehicleId) {
         row.vehicle = ''
       } else {
-        row.vehicle = row.vehicleBuyRecordDto.vehicleType
+        const dto = row.vehicleBuyRecordDto
+        if (dto != null) {
+          row.vehicle = dto.vehicleType
+        }
       }
       return row
     }
