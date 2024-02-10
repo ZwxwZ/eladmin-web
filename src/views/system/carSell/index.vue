@@ -119,9 +119,6 @@
           <el-form-item label="车辆ID" :readonly="true" prop="vehicleId">
             <el-input v-model="form.vehicleId" :placeholder="'为关联车辆的ID,无值则代表没选中关联车辆'" :disabled = "true" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="文件资料ids" :hidden="true" >
-            <el-input v-model="form.filePath" style="width: 370px;" />
-          </el-form-item>
           <el-form-item label="销售人员名称">
             <el-autocomplete
               v-model="form.seller.name"
@@ -139,13 +136,16 @@
           <el-form-item :hidden="true" prop="sellerId" label="用户ID">
             <el-input v-model="form.seller.id" style="width: 370px;" />
           </el-form-item>
+          <el-form-item label="文件资料ids" >
+            <el-input v-model="form.filePath" style="width: 370px;" />
+          </el-form-item>
           <el-form-item label="销售资料">
             <div>
               <template>
                 <el-upload
                   ref="upload"
                   class="upload-demo"
-                  :action="uploadUrl(fileUploadApi)"
+                  :action="uploadToUrl(fileUploadApi)"
                   :on-preview="handlePreview"
                   :on-remove="handleRemove"
                   :before-upload="beforeUpload"
@@ -398,9 +398,9 @@ export default {
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
-    [CRUD.HOOK.beforeRefresh]() {
-      return true
-    },
+    // [CRUD.HOOK.beforeRefresh]() {
+    //   return true
+    // },
     handleSelect(item) {
       this.form.vehicleId = item.id + ''
       this.form.vehicle = item.vehicleType + ''
@@ -412,8 +412,8 @@ export default {
       }
       return dto[field]
     },
-    uploadUrl(uploadApi) {
-      return uploadUrl(uploadApi, this.uploadFilename)
+    uploadToUrl(uploadApi) {
+      return uploadUrl(uploadApi, '')
     },
     upload() {
       this.$refs.upload.submit()

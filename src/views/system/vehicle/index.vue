@@ -364,7 +364,7 @@ export default {
       this.dialogVisible = true
     },
     uploadUrl(fileUploadApi) {
-      return fileUploadApi + '?name=' + this.uploadFilename
+      return fileUploadApi + '?name='
     },
     cancelForm() {
       this.crud.cancelCU()
