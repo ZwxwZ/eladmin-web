@@ -23,6 +23,14 @@
             :label="item.label"
             :value="item.value" />
         </el-select>
+        <label class="el-form-item-label">车辆状态</label>
+        <el-select v-model="query.state" placeholder="车辆状态" clearable size="small" class="filter-item" style="width: 110px"  @keyup.enter.native="crud.toQuery" >
+          <el-option
+            v-for="item in dict.vehicle_state"
+            :key="item.id"
+            :label="item.label"
+            :value="item.value" />
+        </el-select>
         <date-range-picker
           v-model="query.buyTime"
           start-placeholder="购买启始时间"
@@ -80,6 +88,15 @@
             <el-select v-model="form.buyType" filterable placeholder="请选择">
               <el-option
                 v-for="item in dict.buy_vehicle_channel_type"
+                :key="item.id"
+                :label="item.label"
+                :value="item.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="车辆状态">
+            <el-select v-model="form.state" filterable placeholder="请选择">
+              <el-option
+                v-for="item in dict.vehicle_state"
                 :key="item.id"
                 :label="item.label"
                 :value="item.value" />
@@ -150,6 +167,11 @@
             {{ dict.label.buy_vehicle_channel_type[scope.row.buyType] }}
           </template>
         </el-table-column>
+        <el-table-column prop="state" label="车辆状态">
+          <template v-slot="scope">
+            {{ dict.label.vehicle_state[scope.row.state] }}
+          </template>
+        </el-table-column>
         <el-table-column prop="imgPath" label="图片ids"/>
         <el-table-column prop="preview" label="预览图">
           <template v-slot="scope">
@@ -197,7 +219,16 @@ import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
 import { removeValueFromString } from '@/utils/upload'
 
-const defaultForm = { source: null, price: null, user: { id: null }, vehicleType: null, licensePlate: null, buyTime: null, buyType: null }
+const defaultForm = {
+  source: null,
+  price: null,
+  state: null,
+  user: { id: null },
+  vehicleType: null,
+  licensePlate: null,
+  buyTime: null,
+  buyType: null
+}
 
 export default {
   name: 'VehicleBuyRecord',
@@ -209,7 +240,7 @@ export default {
       'fileUploadApi'
     ])
   },
-  dicts: ['buy_vehicle_channel_type'],
+  dicts: ['buy_vehicle_channel_type', 'vehicle_state'],
   cruds() {
     return CRUD({ title: 'vehicleBuyRecordService', url: 'api/vehicleBuyRecord', idField: 'id', sort: 'id,desc', crudMethod: { ...crudVehicleBuyRecord }})
   },
