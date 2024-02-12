@@ -18,6 +18,9 @@ export function del(ids) {
 }
 
 export function getByUserName(username) {
+  if (!username) {
+    username = ''
+  }
   return request({
     url: 'api/users' + '?page=0&size=10&blurry=' + username,
     method: 'get'

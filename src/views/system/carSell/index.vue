@@ -124,7 +124,7 @@
               v-model="form.seller.name"
               :fetch-suggestions="getUserData"
               placeholder="请输入需要搜索的用户名称"
-              :trigger-on-focus="false"
+              :trigger-on-focus="true"
               style="width: 370px;"
               @select="handleSelectUserId"
             >

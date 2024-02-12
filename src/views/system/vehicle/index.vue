@@ -58,12 +58,12 @@
           <el-form-item label="购入价格" prop="price">
             <el-input v-model.number="form.price" :rows="3" type="textarea" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="经办用户名称">
+          <el-form-item label="采购人">
             <el-autocomplete
               v-model="form.user.name"
               :fetch-suggestions="getUserData"
               placeholder="请输入需要搜索的用户名称"
-              :trigger-on-focus="false"
+              :trigger-on-focus="true"
               style="width: 370px;"
               @select="handleSelectUserId"
             >
@@ -156,7 +156,7 @@
         <el-table-column prop="id" label="ID" />
         <el-table-column prop="source" label="来源" />
         <el-table-column prop="price" label="价格" />
-        <el-table-column prop="userName" label="经办用户名称" />
+        <el-table-column prop="userName" label="采购人" />
         <el-table-column :hidden="true" prop="userId" label="用户id" />
         <el-table-column prop="department" label="部门" />
         <el-table-column prop="vehicleType" label="车辆类型" />
