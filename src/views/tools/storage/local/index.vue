@@ -5,6 +5,14 @@
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-input v-model="query.blurry" clearable size="small" placeholder="输入内容模糊搜索" style="width: 200px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <label class="el-form-item-label">业务属性</label>
+        <el-select v-model="query.businessType" placeholder="业务属性" clearable size="small" class="filter-item" style="width: 110px"  @keyup.enter.native="crud.toQuery" >
+          <el-option
+            v-for="item in dict.file_business_type"
+            :key="item.id"
+            :label="item.label"
+            :value="item.value" />
+        </el-select>
         <date-range-picker v-model="query.createTime" class="date-item" />
         <rrOperation />
       </div>
@@ -129,6 +137,7 @@ export default {
       }
     }
   },
+  dicts: ['file_business_type'],
   computed: {
     ...mapGetters([
       'baseApi',
