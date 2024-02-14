@@ -136,8 +136,8 @@
           <el-form-item :hidden="true" prop="sellerId" label="用户ID">
             <el-input v-model="form.seller.id" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="文件资料ids" >
-            <el-input v-model="form.filePath" style="width: 370px;" />
+          <el-form-item :hidden="true" label="文件资料ids" >
+            <el-input v-model="form.filePath" :hidden="true" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="销售资料">
             <div>
