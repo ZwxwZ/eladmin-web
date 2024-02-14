@@ -118,7 +118,7 @@
                   :on-preview="handlePreview"
                   :on-remove="handleRemove"
                   :before-upload="beforeUpload"
-                  :headers="headers"
+                  :headers="carHeader"
                   :on-success="handleSuccess"
                   :on-error="handleError"
                   :multiple="true"
@@ -302,6 +302,7 @@ export default {
   data() {
     return {
       headers: { 'Authorization': getToken() },
+      carHeader: { 'Authorization': getToken(), 'businessType': '1' },
       dialogImageUrl: '',
       dialogVisible: false,
       permission: {
@@ -363,6 +364,7 @@ export default {
       }
       // console.log('upload name: ' + file.name)
       this.uploadFilename = file.name
+      this.businessType = '1'
       return isLt2M
     },
     handleSuccess(response, file, imgFileList) {
@@ -395,7 +397,7 @@ export default {
       this.dialogVisible = true
     },
     uploadUrl(fileUploadApi) {
-      return fileUploadApi + '?name='
+      return fileUploadApi
     },
     cancelForm() {
       this.crud.cancelCU()

@@ -149,7 +149,7 @@
                   :on-preview="handlePreview"
                   :on-remove="handleRemove"
                   :before-upload="beforeUpload"
-                  :headers="headers"
+                  :headers="sellHeader"
                   :on-success="handleSuccess"
                   :on-error="handleError"
                   :multiple="true"
@@ -379,6 +379,7 @@ export default {
       loading: false,
       uploadFilename: '',
       headers: { 'Authorization': getToken() },
+      sellHeader: { 'Authorization': getToken(), 'businessType': '2' },
       rules: {
         dealPrice: [
           { required: true, message: '价格不能为空' },
