@@ -10,6 +10,10 @@ export function upload(api, file) {
   return axios.post(api, data, config)
 }
 
+export function localStorageUrl(localStorage, baseApi) {
+  return `${baseApi}/file/${localStorage.type}/${localStorage.realName}`
+}
+
 export function uploadUrl(fileUploadApi, uploadFilename) {
   return fileUploadApi + '?name=' + uploadFilename
 }
