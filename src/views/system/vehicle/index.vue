@@ -81,7 +81,7 @@
           <el-form-item label="车牌号码">
             <el-input v-model="form.licensePlate" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="购买时间">
+          <el-form-item label="入库时间">
             <el-date-picker v-model="form.buyTime" type="datetime" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="支付方式">
@@ -161,7 +161,7 @@
         <el-table-column prop="department" label="部门" />
         <el-table-column prop="vehicleType" label="车辆类型" />
         <el-table-column prop="licensePlate" label="车牌号码" />
-        <el-table-column prop="buyTime" label="购买时间" />
+        <el-table-column prop="buyTime" label="入库时间" />
         <el-table-column prop="buyType" label="支付方式">
           <template v-slot="scope">
             {{ dict.label.buy_vehicle_channel_type[scope.row.buyType] }}
