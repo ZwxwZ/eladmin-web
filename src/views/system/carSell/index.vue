@@ -93,6 +93,12 @@
           <el-form-item label="成交价">
             <el-input v-model.number="form.dealPrice" :rows="3" style="width: 370px;" />
           </el-form-item>
+          <el-form-item label="采购提成">
+            <el-input v-model.number="form.procurementCommission" :rows="3" style="width: 370px;" />
+          </el-form-item>
+          <el-form-item label="销售提成">
+            <el-input v-model.number="form.salesCommission" :rows="3" style="width: 370px;" />
+          </el-form-item>
           <el-form-item label="成交时间">
             <el-date-picker v-model="form.dealTime" type="datetime" style="width: 370px;" />
           </el-form-item>
@@ -177,6 +183,12 @@
             <el-form label-position="left" label-width="auto"  inline class="table-expand">
               <el-form-item label="来源">
                 <span>{{ vehicleRecordValue(scope.row, 'source') }}</span>
+              </el-form-item>
+              <el-form-item label="采购提成">
+                <span>{{ scope.row.procurementCommission }}</span>
+              </el-form-item>
+              <el-form-item label="销售提成">
+                <span>{{ scope.row.salesCommission }}</span>
               </el-form-item>
               <el-form-item label="购入价格">
                 <span>{{ vehicleRecordValue(scope.row, 'price') }}</span>
@@ -284,7 +296,9 @@ const defaultForm = {
   dealTime: null,
   vehicleId: null,
   filePath: null,
-  vehicle: null
+  vehicle: null,
+  procurementCommission: null,
+  salesCommission: null
 }
 export default {
   name: 'VehicleSellRecord',
