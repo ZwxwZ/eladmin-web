@@ -160,7 +160,7 @@
           </template>
         </el-table-column>
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="vehicleBuyRecordDto.licensePlate" label="车牌" />
+        <el-table-column prop="vehicleBuyRecordDto.vehicleType" label="车辆类型" />
         <el-table-column prop="businessInsurance" label="商业保险" />
         <el-table-column prop="washFee" label="洗车" />
         <el-table-column prop="plateFee" label="上牌费" />
