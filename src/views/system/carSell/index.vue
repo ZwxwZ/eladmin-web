@@ -49,7 +49,7 @@
         <rrOperation :crud="crud" />
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
-      <crudOperation :permission="permission" :hidden-columns="['vehicleId']" />
+      <crudOperation :permission="permission" :hidden-columns="['id','vehicleId']" />
       <!--表单组件-->
       <el-dialog
          :close-on-click-modal="false"
@@ -237,6 +237,8 @@
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" />
         <el-table-column prop="productName" label="商品名称" />
+        <el-table-column prop="vehicleBuyRecordDto.vehicleType" label="车辆类型" />
+        <el-table-column prop="vehicleBuyRecordDto.licensePlate" label="车牌号" />
         <el-table-column prop="payType" label="付款方式">
           <template slot-scope="scope">
             {{ dict.label.car_pay_type[scope.row.payType] }}
