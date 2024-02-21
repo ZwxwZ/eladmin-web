@@ -36,6 +36,15 @@
         <el-form-item label="文件名">
           <el-input v-model="form.name" style="width: 370px;" />
         </el-form-item>
+        <el-form-item label="文件属性">
+          <el-select v-model="form.businessType" filterable placeholder="文件属性，可选">
+            <el-option
+              v-for="item in dict.file_business_type"
+              :key="item.id"
+              :label="item.label"
+              :value="item.value" />
+          </el-select>
+        </el-form-item>
         <!--   上传文件   -->
         <el-form-item v-if="crud.status.add" label="上传">
           <el-upload
@@ -46,7 +55,7 @@
             :headers="headers"
             :on-success="handleSuccess"
             :on-error="handleError"
-            :action="fileUploadApi + '?name=' + form.name"
+            :action="fileUploadApi + '?name=' + form.name + '&businessType=' + form.businessType"
           >
             <div class="eladmin-upload"><i class="el-icon-upload" /> 添加文件</div>
             <div slot="tip" class="el-upload__tip">可上传任意格式文件，且不超过100M</div>
@@ -99,9 +108,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="suffix" label="文件类型" />
+      <el-table-column prop="businessType" label="业务类型" >
+        <template slot-scope="scope">
+          {{ scope.row.businessType? dict.label.file_business_type[scope.row.businessType] : '无' }}
+        </template>
+      </el-table-column>
       <el-table-column prop="type" label="类别" />
       <el-table-column prop="size" label="大小" />
-      <el-table-column prop="operate" label="操作人" />
+      <el-table-column prop="updateBy" label="操作人" />
       <el-table-column prop="createTime" label="创建日期" />
     </el-table>
     <!--分页组件-->
@@ -119,7 +133,7 @@ import crudOperation from '@crud/CRUD.operation'
 import pagination from '@crud/Pagination'
 import DateRangePicker from '@/components/DateRangePicker'
 
-const defaultForm = { id: null, name: '' }
+const defaultForm = { id: null, name: '', businessType: '' }
 export default {
   components: { pagination, crudOperation, rrOperation, DateRangePicker },
   cruds() {
